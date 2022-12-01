@@ -1,5 +1,7 @@
+import PolygonDrawer from "./components/polygon-draw";
+
 function App() {
-  return <>Initial Commit</>;
+  return <PolygonDrawer />;
 }
 
 export default App;
