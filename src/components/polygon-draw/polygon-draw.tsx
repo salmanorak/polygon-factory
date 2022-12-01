@@ -12,6 +12,8 @@ import { Polygon } from "../../shared/types/shapes";
 import { updateArrayItem } from "../../shared/utils/array";
 import { getId, getRandomColor } from "../../shared/utils/common";
 import { getMessage, getMousePos } from "../../shared/utils/draw";
+import ExportToJSON from "../export-to-file";
+import ImportFile from "../import-file";
 import PolygonGroup from "../polygon-group";
 
 const PolygonDrawer: FC = () => {
@@ -83,7 +85,9 @@ const PolygonDrawer: FC = () => {
       ]);
     };
 
-  const message = getMessage(points, completed, isOnStartingPoint);
+  const handleJSONUpload = (uploadedData: any) => {
+    setCompleted(uploadedData);
+  };
 
   useEffect(() => {
     const keydownHandler = (event: KeyboardEvent) => {
@@ -99,47 +103,52 @@ const PolygonDrawer: FC = () => {
     };
   }, []);
 
+  const message = getMessage(points, completed, isOnStartingPoint);
   return (
-    <Stage
-      {...windowSize}
-      {...stageDetails}
-      onClick={handleClick}
-      onMouseMove={handleMouseMove}
-      onWheel={handleWheel}
-      draggable={enableStageDrag}
-      style={{
-        cursor: enableStageDrag ? "grab" : "inherit",
-      }}
-    >
-      <Layer>
-        <Text x={10} y={10} text={message} fontSize={18} draggable />
-        {completed.map(({ id, points, color }, index) => (
+    <>
+      <Stage
+        {...windowSize}
+        {...stageDetails}
+        onClick={handleClick}
+        onMouseMove={handleMouseMove}
+        onWheel={handleWheel}
+        draggable={enableStageDrag}
+        style={{
+          cursor: enableStageDrag ? "grab" : "inherit",
+        }}
+      >
+        <Layer>
+          <Text x={10} y={10} text={message} fontSize={18} draggable />
+          {completed.map(({ id, points, color }, index) => (
+            <PolygonGroup
+              key={id}
+              id={id}
+              points={points}
+              color={color}
+              strokeWidth={2}
+              isClosed={true}
+              index={index}
+              isActiveDraw={false}
+              onDragMove={handlePointDragMove}
+            />
+          ))}
           <PolygonGroup
-            key={id}
             id={id}
-            points={points}
-            color={color}
-            strokeWidth={2}
-            isClosed={true}
-            index={index}
-            isActiveDraw={false}
+            points={points.concat(pointerPosition)}
+            color="black"
+            strokeWidth={4}
+            isClosed={false}
+            index={1}
+            isActiveDraw
+            onMouseOverIn={handleMouseOverStartPoint}
+            onMouseOverOut={handleMouseOutStartPoint}
             onDragMove={handlePointDragMove}
           />
-        ))}
-        <PolygonGroup
-          id={id}
-          points={points.concat(pointerPosition)}
-          color="black"
-          strokeWidth={4}
-          isClosed={false}
-          index={1}
-          isActiveDraw
-          onMouseOverIn={handleMouseOverStartPoint}
-          onMouseOverOut={handleMouseOutStartPoint}
-          onDragMove={handlePointDragMove}
-        />
-      </Layer>
-    </Stage>
+        </Layer>
+      </Stage>
+      <ExportToJSON json={completed} fileName="polygon" />
+      <ImportFile handler={handleJSONUpload} />
+    </>
   );
 };
 
