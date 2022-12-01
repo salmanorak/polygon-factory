@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from "react";
 import { Stage, Layer, Text } from "react-konva";
-import { ZOOM_SCALE } from "../../shared/constant/draw";
+import { usePanWithSpace } from "../../shared/hooks/use-pan-with-space";
 import { useStageZoom } from "../../shared/hooks/use-stage-zoom";
 import { useWindowSize } from "../../shared/hooks/use-window-size";
 import {
@@ -21,8 +21,8 @@ const PolygonDrawer: FC = () => {
   const [points, setPoints] = useState<Point[]>([]);
   const [pointerPosition, setPointerPosition] = useState<MousePosition>([0, 0]);
   const [isOnStartingPoint, setIsOnStartingPoint] = useState<boolean>(false);
-
   const [stageDetails, handleWheel] = useStageZoom();
+  const enableStageDrag = usePanWithSpace();
 
   const handleClick: KonvaEventHandler = (event) => {
     const stage = event.target.getStage();
@@ -86,15 +86,16 @@ const PolygonDrawer: FC = () => {
   const message = getMessage(points, completed, isOnStartingPoint);
 
   useEffect(() => {
-    const handler = (event: KeyboardEvent) => {
+    const keydownHandler = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setPoints([]);
       }
     };
-    document.body.addEventListener("keydown", handler);
+
+    document.body.addEventListener("keydown", keydownHandler);
 
     return () => {
-      document.body.removeEventListener("keydown", handler);
+      document.body.removeEventListener("keydown", keydownHandler);
     };
   }, []);
 
@@ -105,7 +106,10 @@ const PolygonDrawer: FC = () => {
       onClick={handleClick}
       onMouseMove={handleMouseMove}
       onWheel={handleWheel}
-      draggable={true}
+      draggable={enableStageDrag}
+      style={{
+        cursor: enableStageDrag ? "grab" : "inherit",
+      }}
     >
       <Layer>
         <Text x={10} y={10} text={message} fontSize={18} draggable />
