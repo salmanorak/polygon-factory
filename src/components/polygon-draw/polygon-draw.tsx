@@ -105,6 +105,7 @@ const PolygonDrawer: FC = () => {
       onClick={handleClick}
       onMouseMove={handleMouseMove}
       onWheel={handleWheel}
+      draggable={true}
     >
       <Layer>
         <Text x={10} y={10} text={message} fontSize={18} draggable />
