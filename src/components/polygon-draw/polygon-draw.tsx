@@ -1,5 +1,7 @@
 import { FC, useEffect, useState } from "react";
 import { Stage, Layer, Text } from "react-konva";
+import { ZOOM_SCALE } from "../../shared/constant/draw";
+import { useStageZoom } from "../../shared/hooks/use-stage-zoom";
 import { useWindowSize } from "../../shared/hooks/use-window-size";
 import {
   KonvaEventHandler,
@@ -19,6 +21,8 @@ const PolygonDrawer: FC = () => {
   const [points, setPoints] = useState<Point[]>([]);
   const [pointerPosition, setPointerPosition] = useState<MousePosition>([0, 0]);
   const [isOnStartingPoint, setIsOnStartingPoint] = useState<boolean>(false);
+
+  const [stageDetails, handleWheel] = useStageZoom();
 
   const handleClick: KonvaEventHandler = (event) => {
     const stage = event.target.getStage();
@@ -97,9 +101,10 @@ const PolygonDrawer: FC = () => {
   return (
     <Stage
       {...windowSize}
+      {...stageDetails}
       onClick={handleClick}
       onMouseMove={handleMouseMove}
-      on
+      onWheel={handleWheel}
     >
       <Layer>
         <Text x={10} y={10} text={message} fontSize={18} draggable />

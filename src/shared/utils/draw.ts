@@ -3,7 +3,7 @@ import { Point } from "../types/draw";
 import { Stage as StageType } from "konva/lib/Stage";
 
 export const getMousePos = (stage: StageType | null): Point => {
-  const position = stage && stage.getPointerPosition();
+  const position = stage && stage.getRelativePointerPosition();
   if (!position) return [0, 0];
   return [position.x, position.y];
 };
